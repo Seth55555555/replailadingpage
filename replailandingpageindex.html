@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replai v0.1 - Offline AI Study Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: #fafafa;
+            color: #333;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            border-left: 1px solid #eaeaea;
+            border-right: 1px solid #eaeaea;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-frame {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0ff;
+            border: 2px solid #e6e6fa;
+        }
+        
+        .logo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8B5DE8, #6A5DE0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 8px 16px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: #8B5DE8;
+            background-color: #f0f0ff;
+        }
+        
+        .lang-toggle {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: 20px;
+            padding: 4px;
+            position: relative;
+            width: 120px;
+            height: 36px;
+            margin-left: 10px;
+        }
+        
+        .lang-option {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.3s;
+            width: 50%;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .lang-option.active {
+            color: white;
+        }
+        
+        .lang-slider {
+            position: absolute;
+            top: 4px;
+            width: 56px;
+            height: 28px;
+            background: linear-gradient(135deg, #8B5DE8, #6A5DE0);
+            border-radius: 16px;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        .cn-active .lang-slider {
+            transform: translateX(56px);
+        }
+        
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #6A5DE0, #8B5DE8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 700px;
+            margin-bottom: 40px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+            width: 100%;
+        }
+        
+        .feature {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #eaeaea;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(106, 93, 224, 0.1);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: #f0f0ff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: #6A5DE0;
+            font-size: 20px;
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .feature-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .demo-link {
+            background: linear-gradient(135deg, #8B5DE8, #6A5DE0);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+        
+        .demo-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(106, 93, 224, 0.3);
+        }
+        
+        footer {
+            margin-top: auto;
+            padding: 30px 0 20px;
+            border-top: 1px solid #eaeaea;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .footer-link {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-link:hover {
+            color: #8B5DE8;
+        }
+        
+        /* Chinese language version */
+        .cn .en-text {
+            display: none;
+        }
+        
+        .en .cn-text {
+            display: none;
+        }
+        
+        /* Demo page styles */
+        #demo-page, #community-page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 0;
+            width: 100%;
+        }
+        
+        .laptop-frame {
+            width: 900px;
+            max-width: 90%;
+            height: 550px;
+            background: #f0f0f0;
+            border: 12px solid #333;
+            border-radius: 16px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            margin: 30px 0;
+        }
+        
+        .laptop-screen {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('/upload/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .demo-content {
+            width: 80%;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 30px;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .demo-placeholder {
+            font-size: 18px;
+            color: #666;
+            margin: 20px 0;
+        }
+        
+        .back-button {
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .back-button:hover {
+            background: #e0e0e0;
+        }
+        
+        /* Community page styles */
+        .community-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            width: 100%;
+            max-width: 1000px;
+            margin: 30px 0;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        
+        .community-content {
+            flex: 1;
+            min-width: 300px;
+            text-align: left;
+        }
+        
+        .community-news {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .news-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #6A5DE0;
+        }
+        
+        .news-date {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        
+        .news-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .iphone-preview {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .iphone-frame {
+            width: 300px;
+            height: 600px;
+            background: #f0f0f0;
+            border: 12px solid #333;
+            border-radius: 40px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+        }
+        
+        .iphone-screen {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('/upload/display1.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 28px;
+        }
+        
+        .join-button {
+            background: linear-gradient(135deg, #8B5DE8, #6A5DE0);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .join-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(106, 93, 224, 0.3);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .laptop-frame {
+                height: 400px;
+            }
+            
+            .lang-toggle {
+                width: 100px;
+                height: 32px;
+            }
+            
+            .lang-slider {
+                width: 46px;
+                height: 24px;
+            }
+            
+            .cn-active .lang-slider {
+                transform: translateX(46px);
+            }
+            
+            .community-container {
+                flex-direction: column;
+            }
+            
+            .community-content {
+                order: 2;
+            }
+            
+            .iphone-preview {
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body class="en">
+    <header>
+        <div class="logo-container">
+            <div class="logo-frame">
+                <img src="/logo.png" alt="Replai Logo">
+            </div>
+            <div class="logo-text">Replai</div>
+        </div>
+        <nav>
+            <a href="#" class="nav-link active" data-page="home">
+                <span class="en-text">Home</span>
+                <span class="cn-text">首页</span>
+            </a>
+            <a href="#" class="nav-link" data-page="demo">
+                <span class="en-text">Demo/Download</span>
+                <span class="cn-text">演示/下载</span>
+            </a>
+            <a href="#" class="nav-link" data-page="community">
+                <span class="en-text">Community</span>
+                <span class="cn-text">社区</span>
+            </a>
+            <div class="lang-toggle" id="langToggle">
+                <div class="lang-slider"></div>
+                <div class="lang-option active">EN</div>
+                <div class="lang-option">中文</div>
+            </div>
+        </nav>
+    </header>
+    
+    <main id="home-page">
+        <h1>
+            <span class="en-text">Replai-S1</span>
+            <span class="cn-text">Replai-S1</span>
+        </h1>
+        <p class="subtitle">
+            <span class="en-text">Off The Grid AI Solution, Store Text Files and Material Notes into Memory, On-Demand Information Relayer. Experience Replai-S1's Trial For Free Here</span>
+            <span class="cn-text">离线式 AI 解决方案，将文本文件和资料笔记存入记忆库，按需信息中继器。</span>
+        </p>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📚</div>
+                <h3 class="feature-title">
+                    <span class="en-text">Drag and Drop Files</span>
+                    <span class="cn-text">PDF和笔记OCR提取</span>
+                </h3>
+                <p class="feature-desc">
+                    <span class="en-text">OCR Technology extracts text from your uploaded PDF, Word, Excel, Txt Materials into local isolated memory </span>
+                    <span class="cn-text">OCR 技术将您上传的 PDF、Word、Excel、Txt 资料中的文本提取到本地隔离内存中</span>
+                </p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">💬</div>
+                <h3 class="feature-title">
+                    <span class="en-text">Strictly Trained to Align with Your Contents Only</span>
+                    <span class="cn-text">严格训练，仅与您的内容保持一致</span>
+                </h3>
+                <p class="feature-desc">
+                    <span class="en-text">Replai-S1 outperforms commercial benchmarks in content accuracy and logic reasoning, with better classifications and obedience</span>
+                    <span class="cn-text">Replai-S1 在内容准确性和逻辑推理方面优于商业基准，具备更清晰的分类和细腻的流畅表达。</span>
+                </p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">📶</div>
+                <h3 class="feature-title">
+                    <span class="en-text">Fully Offline</span>
+                    <span class="cn-text">完全离线</span>
+                </h3>
+                <p class="feature-desc">
+                    <span class="en-text">Works with blocked internet connection, perfect for exams and low-connectivity environments, ensuring zero confidential data leaks.</span>
+                    <span class="cn-text">在无网络连接的情况下也可运行，非常适合考试和低连接环境，并确保机密数据零泄露。</span>
+                </p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">🌱</div>
+                <h3 class="feature-title">
+                    <span class="en-text">Natural Mode</span>
+                    <span class="cn-text">自然模式</span>
+                </h3>
+                <p class="feature-desc">
+                    <span class="en-text">Natural Mode is a toggle feature aimed to humanize responses so it runs through AI checkers with scores lesser than 29%</span>
+                    <span class="cn-text">自然模式是一项切换功能，旨在使回复更具人性化，从而通过 AI 检测，得分低于 29%。</span>
+                </p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">🫣</div>
+                <h3 class="feature-title">
+                    <span class="en-text">Conceal Mode</span>
+                    <span class="cn-text">隐藏模式</span>
+                </h3>
+                <p class="feature-desc">
+                    <span class="en-text">Hover your cursor to the right edge of the screen, Replai fades to black, concealing your contents, saving you from sticky situations</span>
+                    <span class="cn-text">将光标移到屏幕右侧，Replai 会渐变为黑色，隐藏你的内容。</span>
+                </p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">🌐</div>
+                <h3 class="feature-title">
+                    <span class="en-text">Knowledge Scraping</span>
+                    <span class="cn-text">知识抓取</span>
+                </h3>
+                <p class="feature-desc">
+                    <span class="en-text">Automatically extracts relevant beyond-syllabus information and expands the knowledge base to tackle challenging study questions, saving you from missing notes & surprises</span>
+                    <span class="cn-text">自动提取课外相关信息，扩展知识库，即使在离线状态下，也能应对具有挑战性的学习问题。</span>
+                </p>
+            </div>
+        </div>
+        
+        <a href="#" class="demo-link" data-page="demo">
+            <span class="en-text">View Demo</span>
+            <span class="cn-text">查看演示</span>
+            <span>▶</span>
+        </a>
+    </main>
+    
+    <main id="demo-page">
+        <h1>
+            <span class="en-text">Replai Demo</span>
+            <span class="cn-text">Replai 演示</span>
+        </h1>
+        <p class="subtitle">
+            <span class="en-text">See how Replai delivers your notes coherently when needed the most. Chat with it, fully decentralised</span>
+            <span class="cn-text">在最需要的时候，Replai 为你连贯地整理笔记。与它对话，完全去中心化。</span>
+        </p>
+        
+        <div class="laptop-frame">
+            <div class="laptop-screen">
+                <div class="demo-content">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">
+                        <span class="en-text">Replai Demo Preview</span>
+                        <span class="cn-text">Replai 演示预览</span>
+                    </h3>
+                    <p class="demo-placeholder">
+                        <span class="en-text">App interface with AI study features</span>
+                        <span class="cn-text">具有AI学习功能的应用程序界面</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <button class="back-button" data-page="home">
+            <span class="en-text">← Back to Home</span>
+            <span class="cn-text">← 返回首页</span>
+        </button>
+        <button class="demo-link" style="margin-left: 15px;">
+            <span class="en-text">Windows Download</span>
+            <span class="cn-text">Windows 下载</span>
+        </button>
+    </main>
+    
+    <main id="community-page">
+        <h1>
+            <span class="en-text">Replai Community</span>
+            <span class="cn-text">Replai 社区</span>
+        </h1>
+        <p class="subtitle">
+            <span class="en-text">Latest news and updates about Replai-S1 development and features</span>
+            <span class="cn-text">关于 Replai-S1 开发和功能的最新新闻和更新</span>
+        </p>
+        
+        <div class="community-container">
+            <div class="community-content">
+                <div class="community-news">
+                    <h3 class="news-title">
+                        <span class="en-text">Version 0.1 Release</span>
+                        <span class="cn-text">版本 0.1 发布</span>
+                    </h3>
+                    <div class="news-date">October 15, 2023</div>
+                    <div class="news-content">
+                        <span class="en-text">We're excited to announce the first public release of Replai-S1. This version includes all core features: offline processing, OCR extraction, and natural language mode for human-like responses.</span>
+                        <span class="cn-text">我们很高兴宣布 Replai-S1 的第一个公开版本。此版本包含所有核心功能：离线处理、OCR 提取和用于类人响应的自然语言模式。</span>
+                    </div>
+                </div>
+                
+                <div class="community-news">
+                    <h3 class="news-title">
+                        <span class="en-text">Mobile App Coming Soon</span>
+                        <span class="cn-text">移动应用即将推出</span>
+                    </h3>
+                    <div class="news-date">November 5, 2023</div>
+                    <div class="news-content">
+                        <span class="en-text">Our iOS and Android apps are currently in development, bringing the full Replai-S1 experience to your mobile devices. Expected release: Q1 2024.</span>
+                        <span class="cn-text">我们的 iOS 和 Android 应用程序正在开发中，将为您的移动设备带来完整的 Replai-S1 体验。预计发布时间：2024 年第一季度。</span>
+                    </div>
+                </div>
+                
+                <div class="community-news">
+                    <h3 class="news-title">
+                        <span class="en-text">Knowledge Base Expansion</span>
+                        <span class="cn-text">知识库扩展</span>
+                    </h3>
+                    <div class="news-date">November 20, 2023</div>
+                    <div class="news-content">
+                        <span class="en-text">We've added support for 5 additional document formats and improved OCR accuracy by 27% in the latest update. The knowledge scraping algorithm now recognizes 18% more contextual relationships.</span>
+                        <span class="cn-text">在最新更新中，我们增加了对 5 种额外文档格式的支持，并将 OCR 准确率提高了 27%。知识抓取算法现在能识别多 18% 的上下文关系。</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="iphone-preview">
+                <div class="iphone-frame">
+                    <div class="iphone-screen"></div>
+                </div>
+                <a href="https://community.replai.example.com" class="join-button" target="_blank">
+                    <span class="en-text">Join Community</span>
+                    <span class="cn-text">加入社区</span>
+                    <span>→</span>
+                </a>
+            </div>
+        </div>
+        
+        <button class="back-button" data-page="home">
+            <span class="en-text">← Back to Home</span>
+            <span class="cn-text">← 返回首页</span>
+        </button>
+    </main>
+    
+    <footer>
+        <div class="footer-links">
+            <a href="#" class="footer-link">
+                <span class="en-text">Privacy Policy</span>
+                <span class="cn-text">隐私政策</span>
+            </a>
+            <a href="#" class="footer-link">
+                <span class="en-text">Terms of Service</span>
+                <span class="cn-text">服务条款</span>
+            </a>
+            <a href="#" class="footer-link">
+                <span class="en-text">Support</span>
+                <span class="cn-text">支持</span>
+            </a>
+        </div>
+        <p>© 2023 Replai v0.1 - 
+            <span class="en-text">Offline AI Study Assistant</span>
+            <span class="cn-text">离线AI学习助手</span>
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const langToggle = document.getElementById('langToggle');
+            const body = document.body;
+            const homePage = document.getElementById('home-page');
+            const demoPage = document.getElementById('demo-page');
+            const communityPage = document.getElementById('community-page');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const demoLink = document.querySelector('.demo-link');
+            const backButtons = document.querySelectorAll('.back-button');
+            
+            // Language toggle functionality
+            langToggle.addEventListener('click', function() {
+                body.classList.toggle('en');
+                body.classList.toggle('cn');
+                body.classList.toggle('cn-active');
+                
+                // Update active class on language options
+                const langOptions = document.querySelectorAll('.lang-option');
+                langOptions.forEach(opt => opt.classList.toggle('active'));
+            });
+            
+            // Page navigation functionality
+            function showPage(pageId) {
+                // Hide all pages
+                homePage.style.display = 'none';
+                demoPage.style.display = 'none';
+                communityPage.style.display = 'none';
+                
+                // Remove active class from all nav links
+                navLinks.forEach(link => link.classList.remove('active'));
+                
+                // Show the requested page and set active nav link
+                if (pageId === 'home') {
+                    homePage.style.display = 'flex';
+                    navLinks[0].classList.add('active');
+                } else if (pageId === 'demo') {
+                    demoPage.style.display = 'flex';
+                    navLinks[1].classList.add('active');
+                } else if (pageId === 'community') {
+                    communityPage.style.display = 'flex';
+                    navLinks[2].classList.add('active');
+                }
+            }
+            
+            // Add event listeners for navigation
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showPage(this.getAttribute('data-page'));
+                });
+            });
+            
+            demoLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage(this.getAttribute('data-page'));
+            });
+            
+            backButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showPage(this.getAttribute('data-page'));
+                });
+            });
+        });
+    </script>
+</body>
+</html>
